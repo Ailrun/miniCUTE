@@ -20,6 +20,7 @@ import Minicute.Data.GMachine.Node
 interpretInstruction :: Instruction -> GMachineStepMonad ()
 
 interpretInstruction (IMakeInteger n) = interpretMakeInteger n
+interpretInstruction (IMakeStructure t n) = interpretMakeStructure t n
 interpretInstruction IMakeApplication = interpretMakeApplication
 interpretInstruction (IMakeGlobal i) = interpretMakeGlobal i
 interpretInstruction (IMakePlaceholders n) = interpretMakePlaceholders n
@@ -54,6 +55,13 @@ interpretInstruction inst
 interpretMakeInteger :: Integer -> GMachineStepMonad ()
 interpretMakeInteger n = do
   addr <- allocNodeOnNodeHeap (NInteger n)
+  pushAddrToAddressStack addr
+
+interpretMakeStructure :: Integer -> Integer -> GMachineStepMonad ()
+interpretMakeStructure t a = do
+  argAddrs <- popAddrsFromAddressStack (fromInteger a)
+  fAddr <- allocNodeOnNodeHeap (NStructureFields a argAddrs)
+  addr <- allocNodeOnNodeHeap (NStructure t fAddr)
   pushAddrToAddressStack addr
 
 interpretMakeGlobal :: Identifier -> GMachineStepMonad ()
