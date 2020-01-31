@@ -1,26 +1,43 @@
 {- HLINT ignore "Redundant do" -}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE QuasiQuotes #-}
 -- |
 -- Copyright: (c) 2018-present Junyoung Clare Jang
 -- License: BSD 3-Clause
 module Minicute.PrettyTest
   ( spec_prettyPrint
+
+  , hprop_prettyPrint
   ) where
 
+import Hedgehog
 import Test.Hspec.Megaparsec
 import Test.Tasty.Hspec
+import Test.Tasty.Hedgehog
 
 import Control.Monad
 import Data.Either
+import Minicute.Data.Minicute.Program
 import Minicute.Utils.Common.TH
 import Text.Megaparsec
 
 import qualified Data.Text.Prettyprint.Doc.Minicute as PP
 import qualified Minicute.Parser.Minicute.Parser as P
+import qualified Minicute.Test.Minicute.Gen as Gen
 
 spec_prettyPrint :: Spec
 spec_prettyPrint
   = forM_ testCases (uncurry programMCTest)
+
+hprop_prettyPrint :: Property
+hprop_prettyPrint = do
+  property $ do
+    program <- forAll $ Gen.mainProgram (pure noAnnotation) :: PropertyT IO (MainProgram 'Simple 'MC)
+    case parse P.mainProgramMC "" (show (PP.prettyMC0 program)) of
+      Right reparsedProgram ->
+        program === reparsedProgram
+      Left e ->
+        error (errorBundlePretty e)
 
 programMCTest :: TestName -> TestContent -> SpecWith (Arg Expectation)
 programMCTest name programString = do

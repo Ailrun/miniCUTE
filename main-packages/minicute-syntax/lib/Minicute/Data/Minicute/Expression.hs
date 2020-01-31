@@ -53,6 +53,7 @@ module Minicute.Data.Minicute.Expression
   , pattern EApplication2
   , pattern EApplication3
 
+  , noAnnotation
   , _annotation
   ) where
 
@@ -441,6 +442,9 @@ _matchCaseBody = _Wrapped . _3
 
 makeWrapped ''IsRecursive
 
+
+noAnnotation :: Annotation 'Simple
+noAnnotation = ()
 
 -- |
 -- 'Lens' to extract the annotation of 'AnnotatedExpressionMC'.

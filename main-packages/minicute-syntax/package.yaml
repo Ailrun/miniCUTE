@@ -87,9 +87,11 @@ tests:
       - megaparsec
       - prettyprinter-minicute
 
+      - hedgehog
       - hspec-megaparsec
       - tasty
       - tasty-discover
+      - tasty-hedgehog
       - tasty-hspec
 
       - minicute-common-syntax
